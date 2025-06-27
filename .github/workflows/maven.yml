@@ -74,13 +74,19 @@ jobs:
         run: mvn clean package
 
       - name: Run Packr for windows
-        run: java -jar packr/packr-all-4.0.0.jar packr/packr-config_win.json
+        run: >
+          rm -rf app/win
+          java -jar packr/packr-all-4.0.0.jar packr/packr-config_win.json
 
       - name: Run Packr for Mac
-        run: java -jar packr/packr-all-4.0.0.jar packr/packr-config_mac.json
+        run: >
+          rm -rf app/mac
+          java -jar packr/packr-all-4.0.0.jar packr/packr-config_mac.json
 
       - name: Run Packr for Linux
-        run: java -jar packr/packr-all-4.0.0.jar packr/packr-config_lin.json
+        run: >
+          rm -rf app/win
+          java -jar packr/packr-all-4.0.0.jar packr/packr-config_lin.json
 
       - name: Archive packaged app
         uses: actions/upload-artifact@v4
