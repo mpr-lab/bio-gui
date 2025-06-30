@@ -134,7 +134,7 @@ public class SettingsTab extends JPanel {
     private void addProfile() {
         String newProfileName = JOptionPane.showInputDialog(this, "Enter new profile name:");
         if (newProfileName != null && !newProfileName.trim().isEmpty()) {
-            File newProfileFile = new File("profiles", newProfileName + "_profile.properties");
+            File newProfileFile = new File(String.valueOf(util.getProfileSaveDirFromConfig()), newProfileName + "_profile.properties");
             if (newProfileFile.exists()) {
                 util.append("[Error] Profile already exists.");
                 return;

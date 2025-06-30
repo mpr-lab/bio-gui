@@ -105,6 +105,46 @@
                             </resources>
                         </configuration>
                     </execution>
+
+                    <!-- Copy python-scripts/ folder -->
+                    <execution>
+                        <id>copy-profile-dir</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/profiles</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/profiles</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+
+                    <!-- Copy python-scripts/ folder -->
+                    <execution>
+                        <id>copy-SQMData</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/SQMData</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/SQMData</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

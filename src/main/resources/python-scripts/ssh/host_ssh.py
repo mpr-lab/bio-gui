@@ -52,27 +52,48 @@ def send_to_rpi(m: str) -> str:
 def user_input(data: str) -> None:
     print(data)
 
-    match data:
-        case "status":
-            _status()
-        case "ui":
-            data = ui_commands_ssh.command_menu()
-            print(send_to_rpi(data))
-        case "rsync" | "sync":
-            _rsync()
-        case "help":
-            help_msg = (
-                "Commands:\n"
-                "  ui   – open device UI\n"
-                "  rsync|sync – copy data from sensor\n"
-                "  help – this text\n"
-                "  reload-config – reloads the configs_ssh module\n"
-            )
-            print(help_msg)
-        case "reload-config":
-            importlib.reload(configs_ssh)
-        case _:
-            print(send_to_rpi(data))
+    if data == "status":
+        _status()
+    elif data == "ui":
+        data = ui_commands_ssh.command_menu()
+        print(send_to_rpi(data))
+    elif data == "rsync" or data == "sync":
+        _rsync()
+    elif data == "help":
+        help_msg = (
+            "Commands:\n"
+            "  ui   – open device UI\n"
+            "  rsync|sync – copy data from sensor\n"
+            "  help – this text\n"
+            "  reload-config – reloads the configs_ssh module\n"
+        )
+        print(help_msg)
+    elif data == "reload-config":
+        importlib.reload(configs_ssh)
+    else:
+        print(send_to_rpi(data))
+
+    # match data:
+    #     case "status":
+    #         _status()
+    #     case "ui":
+    #         data = ui_commands_ssh.command_menu()
+    #         print(send_to_rpi(data))
+    #     case "rsync" | "sync":
+    #         _rsync()
+    #     case "help":
+    #         help_msg = (
+    #             "Commands:\n"
+    #             "  ui   – open device UI\n"
+    #             "  rsync|sync – copy data from sensor\n"
+    #             "  help – this text\n"
+    #             "  reload-config – reloads the configs_ssh module\n"
+    #         )
+    #         print(help_msg)
+    #     case "reload-config":
+    #         importlib.reload(configs_ssh)
+    #     case _:
+    #         print(send_to_rpi(data))
 
 
 def _status() -> None:
@@ -87,28 +108,48 @@ def _status() -> None:
 def _ui_loop() -> None:
     while True:
         s = input("\nType message to send: ").strip()
-        match s:
-            case "ui":
-                s = ui_commands_ssh.command_menu()
-            case "rsync" | "sync":
-                _rsync()
-                continue
-            case "status":
-                _status()
-                continue
-            case "exit" | "quit" | "q":
-                print("Ending program")
-                exit()
-            case "help":
-                print("Commands:\n"
-                      "  ui: user interface to generate commands\n"
-                      "  rsync | sync: get data from sensor\n"
-                      "  status: check RPi\n"
-                      "  exit | quit | q: stop program\n"
-                      "  help: print this help menu")
-                continue
-            case _:
-                pass
+        if s == "status":
+            _status()
+        elif s == "ui":
+            s = ui_commands_ssh.command_menu()
+            print(send_to_rpi(s))
+        elif s == "rsync" or s == "sync":
+            _rsync()
+        elif s == "help":
+            help_msg = (
+                "Commands:\n"
+                "  ui   – open device UI\n"
+                "  rsync|sync – copy data from sensor\n"
+                "  help – this text\n"
+                "  reload-config – reloads the configs_ssh module\n"
+            )
+            print(help_msg)
+        elif s == "reload-config":
+            importlib.reload(configs_ssh)
+        else:
+            print(send_to_rpi(s))
+        # match s:
+        #     case "ui":
+        #         s = ui_commands_ssh.command_menu()
+        #     case "rsync" | "sync":
+        #         _rsync()
+        #         continue
+        #     case "status":
+        #         _status()
+        #         continue
+        #     case "exit" | "quit" | "q":
+        #         print("Ending program")
+        #         exit()
+        #     case "help":
+        #         print("Commands:\n"
+        #               "  ui: user interface to generate commands\n"
+        #               "  rsync | sync: get data from sensor\n"
+        #               "  status: check RPi\n"
+        #               "  exit | quit | q: stop program\n"
+        #               "  help: print this help menu")
+        #         continue
+        #     case _:
+        #         pass
 
         print(send_to_rpi(s))
 
