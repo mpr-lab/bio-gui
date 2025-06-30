@@ -11,9 +11,11 @@
   ],
   "resources": [
     "target/python",
-    "target/python-scripts"
+    "target/python-scripts",
+    "target/profiles",
+    "target/SQMData"
   ],
   "icon": "src/main/resources/icon/moth.ico",
   "minimizejre": "soft",
-  "output": "app/win/test2/MPR-Bio-Remote.exe"
+  "output": "app/win/packr"
 }
