@@ -10,8 +10,15 @@
     "-Xmx512m"
   ],
   "resources": [
+<<<<<<< Updated upstream
     "target/python",
     "target/python-scripts"
+=======
+    "src/main/resources/python",
+    "src/main/resources/python-scripts",
+    "src/main/resources/profiles",
+    "src/main/resources/SQMData"
+>>>>>>> Stashed changes
   ],
   "icon": "src/main/resources/icon/moth.ico",
   "minimizejre": "soft",
