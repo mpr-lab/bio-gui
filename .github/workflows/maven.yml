@@ -39,7 +39,7 @@ jobs:
           node-version: '18'
 
       - name: Build project with Maven
-        run:  ./mvnw clean package
+        run:  .\mvnw.cmd clean package
 
       - name: Run Packr for windows
         run: |
