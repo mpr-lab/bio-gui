@@ -39,9 +39,9 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "build" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "build" ]
 
 jobs:
   build:
@@ -75,17 +75,17 @@ jobs:
 
       - name: Run Packr for windows
         run: >
-          rm -rf app/win
+          rm -r app/win
           java -jar packr/packr-all-4.0.0.jar packr/packr-config_win.json
 
       - name: Run Packr for Mac
         run: >
-          rm -rf app/mac
+          rm -r app/mac
           java -jar packr/packr-all-4.0.0.jar packr/packr-config_mac.json
 
       - name: Run Packr for Linux
         run: >
-          rm -rf app/win
+          rm -r app/lin
           java -jar packr/packr-all-4.0.0.jar packr/packr-config_lin.json
 
       - name: Archive packaged app
@@ -95,6 +95,7 @@ jobs:
           path: |
             app/win/**
             app/mac/**
+            app/lin/**
             target/**
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
