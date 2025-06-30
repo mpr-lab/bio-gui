@@ -17,7 +17,7 @@ ArchitecturesInstallIn64BitMode=x64
 
 [Files]
 ; Recursively include everything in app/
-Source: "C:\Users\buddy\Desktop\app2\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
+Source: "..\app\win\packr\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
 
 [Icons]
 ; Desktop shortcut
