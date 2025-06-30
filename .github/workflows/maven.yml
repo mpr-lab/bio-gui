@@ -74,17 +74,17 @@ jobs:
         run: mvn clean package
 
       - name: Run Packr for windows
-        run: >
+        run: |
           rm -r app/win
           java -jar packr/packr-all-4.0.0.jar packr/packr-config_win.json
 
       - name: Run Packr for Mac
-        run: >
+        run: |
           rm -r app/mac
           java -jar packr/packr-all-4.0.0.jar packr/packr-config_mac.json
 
       - name: Run Packr for Linux
-        run: >
+        run: |
           rm -r app/lin
           java -jar packr/packr-all-4.0.0.jar packr/packr-config_lin.json
 
