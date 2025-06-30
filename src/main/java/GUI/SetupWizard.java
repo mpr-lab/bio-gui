@@ -9,15 +9,15 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 
 public class SetupWizard extends JFrame {
-    private Path profileSaveDir = Paths.get(System.getProperty("user.home"), "profiles");
-    private Path SQMSaveDir = Paths.get(System.getProperty("user.home"), "SQMdata");
+    private Path profileSaveDir = Paths.get("profiles");
+
+    private Path SQMSaveDir = Paths.get("SQMData");
 
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel cardPanel = new JPanel(cardLayout);
     private final JButton nextButton = new JButton("Next");
     private final JButton backButton = new JButton("Back");
     private final JProgressBar progressBar = new JProgressBar(0, 10);
-    private final Map<String, Integer> sectionStart = new LinkedHashMap<>();
     private int currentCard = 0;
 
     private final java.util.List<RPiProfile> profiles = new ArrayList<>();
@@ -40,15 +40,7 @@ public class SetupWizard extends JFrame {
         setSize(600, 500);
         setLocationRelativeTo(null);
         autoDetectSystem();
-        System.out.println(detectedOS);
         detectedOS = util.getDetectedOSType();
-        System.out.println("after update" + detectedOS);
-
-
-        // Sections
-        sectionStart.put("Host Setup", 0);
-        sectionStart.put("RPi Setup", 2);
-        sectionStart.put("SSH Setup", 4);
 
         wizardSteps.add(buildDisclaimerPanel());                // 0
         wizardSteps.add(buildTailscale());                      // 1
@@ -123,10 +115,9 @@ public class SetupWizard extends JFrame {
             insertPanel(buildTailscaleSetup(), insertIndex++, "tailscale");
         }
 
-        // The radio panel must come after the rpi config panel, which is always present at index 2 (or 3 if tailscale is inserted)
         int radioIndex = yTailscale.isSelected() ? insertIndex + 1 : insertIndex;
         if (yRadio.isSelected()) {
-            insertPanel(buildRadioSetup(), radioIndex, "radio");
+            insertPanel(buildRadioSetup(), insertIndex + 1, "radio");
         }
     }
 
@@ -559,8 +550,17 @@ public class SetupWizard extends JFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Create it if it doesn't exist
+        if (!Files.exists(profileSaveDir)) {
+            try {
+                Files.createDirectories(profileSaveDir);
+            } catch (IOException e) {
+                System.err.println("Failed to create profiles directory: " + e.getMessage());
+            }
+        }
+
         JLabel label = new JLabel("Select a directory where your Raspberry Pi profiles will be saved:");
-        JTextField pathField = new JTextField("Choose a location to store RPi profiles", 30);
+        JTextField pathField = new JTextField(profileSaveDir.toFile().getAbsolutePath(), 30);
         pathField.setEditable(false);
 
         JButton toggleChooserButton = new JButton("Show File Chooser");
@@ -573,6 +573,7 @@ public class SetupWizard extends JFrame {
 
         // Create the embedded file chooser
         JFileChooser embeddedChooser = new JFileChooser();
+        embeddedChooser.setCurrentDirectory(profileSaveDir.toFile());
         embeddedChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         embeddedChooser.setPreferredSize(new Dimension(500, 275));  // smaller height
         embeddedChooser.setVisible(false);  // initially hidden
@@ -614,8 +615,17 @@ public class SetupWizard extends JFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Create it if it doesn't exist
+        if (!Files.exists(SQMSaveDir)) {
+            try {
+                Files.createDirectories(SQMSaveDir);
+            } catch (IOException e) {
+                System.err.println("Failed to create profiles directory: " + e.getMessage());
+            }
+        }
+
         JLabel label = new JLabel("Select a directory where data synced from the rpi will be saved:");
-        JTextField pathField = new JTextField("Choose a location to store synced data", 30);
+        JTextField pathField = new JTextField(SQMSaveDir.toFile().getAbsolutePath(), 30);
         pathField.setEditable(false);
 
         JButton toggleChooserButton = new JButton("Show File Chooser");
@@ -629,6 +639,7 @@ public class SetupWizard extends JFrame {
         // Create the embedded file chooser
         JFileChooser embeddedChooser = new JFileChooser();
         embeddedChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        embeddedChooser.setCurrentDirectory(SQMSaveDir.toFile());
         embeddedChooser.setPreferredSize(new Dimension(500, 275));  // smaller height
         embeddedChooser.setVisible(false);  // initially hidden
 
@@ -663,8 +674,6 @@ public class SetupWizard extends JFrame {
 
         return panel;
     }
-
-
 
 
     private JPanel buildSSH(){
@@ -708,129 +717,6 @@ public class SetupWizard extends JFrame {
         }
         return panel;
     }
-
-//    private JPanel buildSSH_Step1(){
-//        JPanel panel = new JPanel(new BorderLayout());
-//        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-//
-//        JPanel inner = new JPanel();
-//        inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
-//
-//        // STEP 1: CHECK IS SSH INSTALLED< IF IT's NOT, INSTALL IT
-//        JPanel step1 = new JPanel();
-//        step1.setLayout(new BoxLayout(step1, BoxLayout.Y_AXIS));
-//        step1.add(new JLabel("Step 1: Check if SSH is installed"));
-//        step1.add(Box.createRigidArea(new Dimension(0, 10)));
-//
-//        JTextArea copyI1 = util.buildTextArea(step1, 45);
-//        copyI1.setText("Open up a new terminal. First, check whether or not you have ssh installed. This looks different on different operating systems. Your operating system is "+". If that does not seem right....");
-//        String sshCmd = "";
-//        JTextArea proceedI1 = util.buildTextArea(step1, 45);
-//        switch (detectedOS) {
-//            case "windows" -> {
-//                sshCmd = "ssh";
-//                proceedI1.setText("For windows users, there should be a line printed in the output of the terminal after running the first command that says 'Active: active (running)' if SSH is active. If this is the case, then move onto [STEP 2]. If not, move on to [STEP 2a].");
-//            }
-//            case "mac"     -> {
-//                sshCmd = "sudo systemsetup -getremotelogin";
-//                proceedI1.setText("For linux users, there should be a line printed in the output of the terminal after running the first command that says 'Active: active (running)' if SSH is active. If this is the case, then move onto [STEP 2]. If not, move on to [STEP 2a].");
-//            }
-//            case "linux"   -> {
-//                sshCmd = "systemctl status sshd";
-//                proceedI1.setText("For linux users, there should be a line printed in the output of the terminal after running the first command that says 'Active: active (running)' if SSH is active. If this is the case, then move onto [STEP 2]. If not, move on to [STEP 2a].");
-//            }
-//        }
-//        JPanel checkSSHRow = buildCopyRow(sshCmd);
-//
-//        step1.add(copyI1);
-//        step1.add(Box.createRigidArea(new Dimension(0, 10)));
-//        step1.add(checkSSHRow);
-//        step1.add(Box.createRigidArea(new Dimension(0, 10)));
-//        step1.add(proceedI1);
-//        step1.add(Box.createRigidArea(new Dimension(0, 30)));
-//
-//        // STEP 1a: DOWNLOAD SSH IF NOT DOWNLOADED
-//        JPanel step1a = new JPanel();
-//        step1a.setLayout(new BoxLayout(step1a, BoxLayout.Y_AXIS));
-//        step1a.add(new JLabel("Step 1a: Download SSH"));
-//        step1a.add(Box.createRigidArea(new Dimension(0, 10)));
-//
-////        JTextArea copyI1a = util.buildTextArea(step1, 15);
-////        copyI1.setText("If you do not already have ssh installed: ");
-////        step1a.add(copyI1a);
-////        step1a.add(Box.createRigidArea(new Dimension(0, 10)));
-//
-//        switch (detectedOS) {
-//            case "windows" -> {
-//                JTextArea download = util.buildTextArea(step1, 200);
-//                download.setText("""
-//                        If SSH is installed, it will display help information about the command, including its usage and available options. If the terminal returns: "SSH not recognized", then this means SSH is not installed or enabled on your system. Follow these steps to download ssh:
-//
-//                        1) Go to Settings > Apps > Apps & Features > Optional Features
-//
-//                        2) Click on "Add a feature" and select OpenSSH Client
-//
-//                        3) Click "Install" to add the OpenSSH Client to your system
-//
-//                        4) You may need to restart your system for the changes to take effect
-//
-//                        5) After installing OpenSSH Client, open a new command prompt or PowerShell and type `ssh` again to confirm that it is now recognized.
-//                        """);
-//                step1a.add(download);
-//                step1a.add(Box.createRigidArea(new Dimension(0, 10)));
-//            }
-//            case "mac"     -> {
-//                JTextArea download = util.buildTextArea(step1, 200);
-//                download.setText("""
-//                Mac operating systems should come pre-installed with SSH. If SSH is enabled, the output will show "Remote Login: On". If it's off, it will show "Remote Login: Off". SSH may be disabled on your system. In that case, follow these steps to enable it:
-//
-//                1) Open System Preferences (Apple menu > System Preferences)
-//
-//                2) Go to Sharing
-//
-//                3) Look for "Remote Login" on the left-hand side
-//
-//                4) To enable SSH, activate the checkmark next to "Remote Login"
-//                """);
-//                step1a.add(download);
-//                step1a.add(Box.createRigidArea(new Dimension(0, 10)));
-//            }
-//            case "linux"   -> {
-//                JTextArea download = util.buildTextArea(step1, 45);
-//                download.setText("""
-//                If the terminal says anything along the lines of "Unit file sshd.service does not exist", then you do not have ssh installed. Run the following command in your terminal to install SSH:
-//                """);
-//                step1a.add(download);
-//                step1a.add(Box.createRigidArea(new Dimension(0, 10)));
-//
-//                String downloadCmd = "sudo apt install openssh-server openssh-client";
-//                JPanel downloadSSHRow = buildCopyRow(downloadCmd);
-//                step1a.add(downloadSSHRow);
-//                step1a.add(Box.createRigidArea(new Dimension(0, 10)));
-//
-//                JTextArea enable = util.buildTextArea(step1, 45);
-//                enable.setText("""
-//                It may be the case that SSH is installed but is not active. To enable SSH, run the following command in your terminal:
-//                """);
-//                step1a.add(download);
-//                step1a.add(Box.createRigidArea(new Dimension(0, 10)));
-//
-//                String enableCmd = "sudo systemctl start ssh";
-//                JPanel enableSSHRow = buildCopyRow(enableCmd);
-//                step1a.add(enableSSHRow);
-//                step1a.add(Box.createRigidArea(new Dimension(0, 20)));
-//            }
-//        }
-//
-//        inner.add(step1);
-//        inner.add(step1a);
-//
-//        JScrollPane scroll = new JScrollPane(inner);
-//        scroll.setBorder(null);
-//
-//        panel.add(scroll);
-//        return panel;
-//    }
 
     private JPanel buildSSH_Step2(){
         JPanel panel = new JPanel();
@@ -980,33 +866,10 @@ public class SetupWizard extends JFrame {
             System.err.println("[Setup] Failed to save host config paths: " + e.getMessage());
         }
     }
-//    public void updatePathPy(String newPath) {
-//        try {
-//            File file = new File("python-scripts/ssh/configs_ssh.py");
-//            BufferedReader reader = new BufferedReader(new FileReader(file));
-//            StringBuilder content = new StringBuilder();
-//
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                if (line.trim().startsWith("host_data_path ="))
-//                    line = "host_data_path = \"" + newPath + "\"";
-//
-//                content.append(line).append("\n");
-//            }
-//            reader.close();
-//
-//            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-//            writer.write(content.toString());
-//            writer.close();
-//
-//        } catch (IOException e) {
-//            util.append("[Error] configs.py update failed: " + e.getMessage());
-//        }
-//    }
-public void updatePathPy(String newPath) {
+private void updatePathPy(String newPath) {
     try {
         String pythonPath;
-        if (detectedOS.equals("windows")) {
+        if (detectedOS.toLowerCase().contains("win")) {
             // Escape backslashes for Windows Python
             pythonPath = newPath.replace("\\", "\\\\");
         } else {
@@ -1021,7 +884,7 @@ public void updatePathPy(String newPath) {
         String line;
         while ((line = reader.readLine()) != null) {
             if (line.trim().startsWith("host_data_path ="))
-                line = "host_data_path = \"" + pythonPath + "\"";
+                line = "host_data_path =\"" + pythonPath + "\"";
             content.append(line).append("\n");
         }
         reader.close();
@@ -1049,6 +912,7 @@ public void updatePathPy(String newPath) {
                     props.setProperty("rpi_addr", addr);
                     props.store(new FileWriter(profileSaveDir.resolve(name + "_profile.properties").toFile()), "RPi Profile");
                 }
+                util.updateConfigsPy(name, addr);
             }
             saveHostPathsToConfig();
             Files.deleteIfExists(progressFile);

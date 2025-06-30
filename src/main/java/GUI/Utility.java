@@ -99,58 +99,93 @@ public class Utility {
      * Runs the Python backend script with a command and streams its output to the console.
      * @param cmd The command string to send.
      */
+//    public void sendCommand(String cmd) {
+//        if (cmd == null || cmd.isBlank()) {
+//            System.out.println("[DEBUG] Command is null or blank — skipping.");
+//            return;
+//        }
+//
+//        System.out.println("[DEBUG] Sending command: " + cmd);
+//        append("\n> " + cmd);
+//
+//        try {
+//            File backendFile = new File(BACKEND_PATH.getAbsolutePath());
+//            System.out.println("[DEBUG] BACKEND_PATH = " + BACKEND_PATH);
+//            System.out.println("[DEBUG] BACKEND_PATH absolute = " + backendFile.getAbsolutePath());
+//            System.out.println("[DEBUG] File exists? " + backendFile.exists());
+//
+//            // Prepare command
+//            ProcessBuilder pb = new ProcessBuilder(getPythonPath(), BACKEND_PATH.getAbsolutePath(), cmd);
+//            pb.redirectErrorStream(true);
+//            Process p = pb.start();
+//
+//            System.out.println("[DEBUG] Process started.");
+//
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//            String line;
+//            int lineCount = 0;
+//
+//            while ((line = reader.readLine()) != null) {
+//                System.out.println("[DEBUG] Python output: " + line);
+//                append(line);
+//                lineCount++;
+//            }
+//
+//            int exitCode = p.waitFor();
+//            System.out.println("[DEBUG] Process exited with code: " + exitCode);
+//
+//            if (lineCount == 0) {
+//                System.out.println("[DEBUG] No output received from backend.");
+//            }
+//
+//            if (exitCode == 0) {
+//                showToast(CONSOLE, "Command sent: " + cmd, "success", 2000);
+//            } else {
+//                showToast(CONSOLE, "Command failed: " + cmd, "error", 2000);
+//            }
+//
+//        } catch (IOException | InterruptedException ex) {
+//            System.out.println("[DEBUG] Exception thrown: " + ex.getMessage());
+//            ex.printStackTrace();
+//            append("[ERR] " + ex.getMessage());
+//            showToast(CONSOLE, "Error: " + ex.getMessage(), "error", 2000);
+//        }
+//    }
     public void sendCommand(String cmd) {
-        if (cmd == null || cmd.isBlank()) {
-            System.out.println("[DEBUG] Command is null or blank — skipping.");
-            return;
-        }
+        if (cmd == null || cmd.isBlank()) return;
 
-        System.out.println("[DEBUG] Sending command: " + cmd);
         append("\n> " + cmd);
 
         try {
-            File backendFile = new File(BACKEND_PATH.getAbsolutePath());
-            System.out.println("[DEBUG] BACKEND_PATH = " + BACKEND_PATH);
-            System.out.println("[DEBUG] BACKEND_PATH absolute = " + backendFile.getAbsolutePath());
-            System.out.println("[DEBUG] File exists? " + backendFile.exists());
-
-            // Prepare command
-            ProcessBuilder pb = new ProcessBuilder(getPythonPath(), BACKEND_PATH.getAbsolutePath(), cmd);
+            ProcessBuilder pb = new ProcessBuilder("python3", BACKEND_PATH.getAbsolutePath(), cmd);
             pb.redirectErrorStream(true);
             Process p = pb.start();
 
-            System.out.println("[DEBUG] Process started.");
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            StringBuilder outputBuffer = new StringBuilder();
             String line;
-            int lineCount = 0;
-
             while ((line = reader.readLine()) != null) {
-                System.out.println("[DEBUG] Python output: " + line);
                 append(line);
-                lineCount++;
+                outputBuffer.append(line).append("\n");
             }
 
             int exitCode = p.waitFor();
-            System.out.println("[DEBUG] Process exited with code: " + exitCode);
 
-            if (lineCount == 0) {
-                System.out.println("[DEBUG] No output received from backend.");
-            }
-
-            if (exitCode == 0) {
-                showToast(CONSOLE, "Command sent: " + cmd, "success", 2000);
+            String output = outputBuffer.toString().toLowerCase(); // Normalize for easier checking
+            if (exitCode == 0 && !output.contains("error")) {
+                showToast(CONSOLE, "Command sent successfully: " + cmd, "success", 2000);
+            } else if (output.contains("error") || output.contains("traceback") || exitCode != 0) {
+                showToast(CONSOLE, "Command failed: " + cmd + "\n Check console for details.", "error", 3000);
             } else {
-                showToast(CONSOLE, "Command failed: " + cmd, "error", 2000);
+                showToast(CONSOLE, "Command completed with unknown status: " + cmd, "info", 3000);
             }
 
         } catch (IOException | InterruptedException ex) {
-            System.out.println("[DEBUG] Exception thrown: " + ex.getMessage());
-            ex.printStackTrace();
             append("[ERR] " + ex.getMessage());
-            showToast(CONSOLE, "Error: " + ex.getMessage(), "error", 2000);
+            showToast(CONSOLE, "Error running command: " + ex.getMessage(), "error", 3000);
         }
     }
+
 
     /**
      * Shows a temporary toast-style popup message on the bottom-right of the parent window.
@@ -165,7 +200,12 @@ public class Utility {
             toast.setBackground(new Color(0, 0, 0, 0));
 
             Color bgColor;
-            bgColor = new Color(155, 170, 194, 220);
+            switch (type) {
+                case "error":   bgColor = new Color(242, 178, 178, 220); break;
+                case "success": bgColor = new Color(172, 188, 160, 220); break;
+                case "info":    bgColor = new Color(155, 170, 194, 220); break;
+                default:        bgColor = new Color(155, 170, 194, 220); break;
+            }
 
             JPanel panel = new JPanel() {
                 protected void paintComponent(Graphics g) {

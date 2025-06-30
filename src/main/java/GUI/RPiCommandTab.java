@@ -196,8 +196,6 @@ public class RPiCommandTab extends JPanel {
      * input panel if the operation was cancelled / invalid.
      * ---------------------------------------------------------------- */
     private void promptIntervalPeriod() {
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(4, 1, 5, 5));
         JLabel unitLabel = new JLabel("Select unit:");
@@ -243,8 +241,6 @@ public class RPiCommandTab extends JPanel {
 
 
     private void promptIntervalThreshold() {
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(2, 1, 5, 5));
         inner.add(new JLabel("Threshold (mag/arcsec²):"));
@@ -279,8 +275,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptReturnOneRecord() {
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(2, 1, 5, 5));
         inner.add(new JLabel("Record pointer (0-9999999999):"));
@@ -315,8 +309,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptLightOffset() {                              // zcal5<value>x
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(2, 1, 5, 5));
         inner.add(new JLabel("Light offset (mag/arcsec²):"));
@@ -351,8 +343,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptLightTemp() {                                //zcal6<value>x
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(2, 1, 5, 5));
         inner.add(new JLabel("Light temperature (°C):"));
@@ -387,8 +377,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptDarkPeriod() {                               //zcal7<value>x
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(2, 1, 5, 5));
         inner.add(new JLabel("Dark period (s):"));
@@ -423,8 +411,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptDarkTemp() {                                 //zcal8<value>x
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(2, 1, 5, 5));
         inner.add(new JLabel("Dark temperature (°C):"));
@@ -459,8 +445,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptSimulation() {                               // S,count.freq,temp x
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(4, 2, 5, 5));
         JTextField countsField = new JTextField();
@@ -506,8 +490,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptTriggerMode() {                              // LM<mode>x
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(2, 1, 5, 5));
         inner.add(new JLabel("Select trigger mode (0–7):"));
@@ -537,8 +519,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptLogIntervalPeriod() {                        // LP[S|M]<value>x
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(4, 1, 5, 5));
         JLabel unitLabel = new JLabel("Select unit:");
@@ -579,8 +559,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptLogThreshold() {                             // LPT<threshold>x
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(2, 1, 5, 5));
         inner.add(new JLabel("Threshold (mag/arcsec²):"));
@@ -614,8 +592,6 @@ public class RPiCommandTab extends JPanel {
     }
 
     private void promptSetClock() {                                 // LcYYYY-MM-DD w HH:MM:SSx
-        Utility util = new Utility(CONSOLE);
-
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         JPanel inner = new JPanel(new GridLayout(3, 2, 5, 5));
         JTextField dateField = new JTextField();                    // yyyyMMdd
