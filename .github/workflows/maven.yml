@@ -33,21 +33,22 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Maven
-        run: sudo apt-get update && sudo apt-get install -y maven
-
       - name: Install Node.js (for create-dmg or utilities)
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Build project with Maven
-        run: mvn clean package
+        run:  ./mvnw clean package
 
       - name: Run Packr for windows
         run: |
-          rm -r app/win
+          rm -r app/win/packr
           java -jar packr/packr-all-4.0.0.jar packr/packr-config_win.json
+
+#      - name: Run Inno-Setup for windows
+#        run: |
+          
 
       - name: Run Packr for Mac
         run: |
