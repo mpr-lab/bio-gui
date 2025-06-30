@@ -115,10 +115,9 @@ public class SetupWizard extends JFrame {
             insertPanel(buildTailscaleSetup(), insertIndex++, "tailscale");
         }
 
-        // The radio panel must come after the rpi config panel, which is always present at index 2 (or 3 if tailscale is inserted)
         int radioIndex = yTailscale.isSelected() ? insertIndex + 1 : insertIndex;
         if (yRadio.isSelected()) {
-            insertPanel(buildRadioSetup(), radioIndex, "radio");
+            insertPanel(buildRadioSetup(), insertIndex + 1, "radio");
         }
     }
 
@@ -913,6 +912,7 @@ private void updatePathPy(String newPath) {
                     props.setProperty("rpi_addr", addr);
                     props.store(new FileWriter(profileSaveDir.resolve(name + "_profile.properties").toFile()), "RPi Profile");
                 }
+                util.updateConfigsPy(name, addr);
             }
             saveHostPathsToConfig();
             Files.deleteIfExists(progressFile);
