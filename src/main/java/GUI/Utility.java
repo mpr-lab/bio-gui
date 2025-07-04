@@ -287,23 +287,28 @@ public class Utility {
      * @param height The preferred height of the row.
      * @return The assembled JPanel.
      */
-    JPanel buildCopyRow(String command, int height){
+
+    JPanel buildCopyRow(String command) {
         JPanel row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+
         JTextField cmdField = new JTextField(command);
         cmdField.setEditable(false);
+
         JButton copyBtn = new JButton("Copy");
         copyBtn.addActionListener(e -> copyToClipboard(command));
+
         row.add(cmdField);
         row.add(Box.createRigidArea(new Dimension(10, 0)));
         row.add(copyBtn);
-        row.setMaximumSize(new Dimension(500, height));
-        setFullWidth.accept(row);
 
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        row.setMaximumSize(new Dimension(Short.MAX_VALUE, cmdField.getPreferredSize().height));
         return row;
     }
 
-    int preferredWidth = 475;
+
+    int preferredWidth = 465;
     java.util.function.Consumer<JComponent> setFullWidth = comp -> {
         comp.setAlignmentX(Component.LEFT_ALIGNMENT);
         Dimension d = comp.getPreferredSize();
@@ -311,20 +316,24 @@ public class Utility {
         comp.setMaximumSize(d);
     };
 
+
     /**
      * Builds a read-only, word-wrapped JTextArea with consistent styling.
      * @param panel The parent panel to inherit background color.
      * @param height The preferred height of the text area.
      * @return The configured JTextArea.
      */
-    JTextArea buildTextArea(JPanel panel, int height){
+    JTextArea buildTextArea(JPanel panel) {
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setBackground(panel.getBackground());
-        textArea.setPreferredSize(new Dimension(preferredWidth, height));
-        setFullWidth.accept(textArea);
+        textArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Let it expand naturally in a scrollable layout
+        textArea.setMaximumSize(new Dimension(preferredWidth, Integer.MAX_VALUE));
+        textArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         return textArea;
     }
