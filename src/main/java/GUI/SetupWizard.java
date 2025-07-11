@@ -437,6 +437,8 @@ public class SetupWizard extends JFrame {
 //        inner.add(step4);
 
         JScrollPane scroll = new JScrollPane(inner);
+        scroll.getViewport().setViewPosition(new Point(0, 0));
+        scroll.repaint();
 
         panel.add(north, BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);
@@ -607,6 +609,7 @@ public class SetupWizard extends JFrame {
         inner.add(step3);
         JScrollPane scroll = new JScrollPane(inner);
         scroll.getViewport().setViewPosition(new Point(0, 0));
+        scroll.repaint();
 
         panel.add(north, BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);
@@ -829,6 +832,7 @@ public class SetupWizard extends JFrame {
         inner.add(Box.createVerticalStrut(10));
         JScrollPane scroll = new JScrollPane(inner);
         scroll.getViewport().setViewPosition(new Point(0, 0));
+        scroll.repaint();
 
         panel.add(new JLabel("SSH SETUP"), BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);
@@ -933,6 +937,7 @@ public class SetupWizard extends JFrame {
 
         JScrollPane scroll = new JScrollPane(inner);
         scroll.getViewport().setViewPosition(new Point(0, 0));
+        scroll.repaint();
 
         panel.add(scroll);
         return panel;

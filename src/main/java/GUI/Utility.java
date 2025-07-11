@@ -338,6 +338,32 @@ public class Utility {
         return textArea;
     }
 
+    JTextArea buildTextArea(JPanel parent, String text) {
+        JTextArea textArea = new JTextArea(text);
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setBackground(parent.getBackground());
+        textArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        textArea.setBorder(null);
+
+        // Compute preferred height based on wrapped lines
+        FontMetrics fm = textArea.getFontMetrics(textArea.getFont());
+        int lineHeight = fm.getHeight();
+
+        // Estimate number of lines after wrapping
+        int maxWidth = 450;  // match layout width or container's max width
+        textArea.setSize(new Dimension(maxWidth, Integer.MAX_VALUE));
+        int lineCount = textArea.getLineCount();  // after setting size
+
+        int preferredHeight = lineHeight * lineCount + 10;
+        textArea.setPreferredSize(new Dimension(maxWidth, preferredHeight));
+        textArea.setMaximumSize(new Dimension(maxWidth, preferredHeight));
+
+        return textArea;
+    }
+
+
     /**
      * Reads the profile save directory from host_config.properties.
      * @return The Path to the profile save directory, or null if not set.
