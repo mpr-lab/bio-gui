@@ -5,6 +5,8 @@ import java.awt.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 public class BuildGUI extends JFrame {
     private static final JTextArea console = new JTextArea();
@@ -128,7 +130,20 @@ public class BuildGUI extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedLookAndFeelException {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // If Nimbus is not available, you can set the GUI to another L&F.
+            // For example, the default cross-platform Metal L&F.
+            UIManager.setLookAndFeel(new MetalLookAndFeel());
+
+        }
         Path setupDir = Paths.get("host_config.properties");
         if (Files.notExists(setupDir)) {
             SwingUtilities.invokeLater(SetupWizard::new);

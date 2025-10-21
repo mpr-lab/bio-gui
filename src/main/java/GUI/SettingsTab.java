@@ -7,6 +7,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.nio.file.*;
+import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 public class SettingsTab extends JPanel {
     private final Utility util;
@@ -18,7 +20,6 @@ public class SettingsTab extends JPanel {
     private String currentProfile;
     private final JTextField profilePathField = new JTextField();
     private final JTextField dataPathField = new JTextField();
-
 
     public SettingsTab(Utility util) {
         this.util = util;
