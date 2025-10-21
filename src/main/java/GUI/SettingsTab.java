@@ -1,6 +1,7 @@
 package GUI;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -15,6 +16,9 @@ public class SettingsTab extends JPanel {
     private final JTextField rpiAddrField = new JTextField();
     private final Properties currentProps = new Properties();
     private String currentProfile;
+    private final JTextField profilePathField = new JTextField();
+    private final JTextField dataPathField = new JTextField();
+
 
     public SettingsTab(Utility util) {
         this.util = util;
@@ -73,6 +77,54 @@ public class SettingsTab extends JPanel {
 
         rightPanel.add(Box.createVerticalGlue());
         rightPanel.add(buttonPanel);
+
+        // ==== File Path Configuration Section ====
+        JPanel pathPanel = new JPanel();
+        pathPanel.setLayout(new BoxLayout(pathPanel, BoxLayout.Y_AXIS));
+        Border border = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+        pathPanel.setBorder(BorderFactory.createTitledBorder(border, "File Path Configuration"));
+        pathPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+
+// Load initial paths from host_config.properties
+        Path profileDir = util.getProfileSaveDirFromConfig();
+        Path dataDir = util.getSQMSaveDirFromConfig();
+        if (profileDir != null) profilePathField.setText(profileDir.toString());
+        if (dataDir != null) dataPathField.setText(dataDir.toString());
+
+// Profile path row
+        JPanel profileRow = new JPanel(new BorderLayout(5, 5));
+        profileRow.add(new JLabel("Profile Save Path:"), BorderLayout.WEST);
+        profileRow.add(profilePathField, BorderLayout.CENTER);
+        JButton browseProfileBtn = new JButton("Browse");
+        browseProfileBtn.addActionListener(e -> {
+            assert profileDir != null;
+            choosePath(profilePathField, profileDir.toString());
+        });
+        profileRow.add(browseProfileBtn, BorderLayout.EAST);
+        pathPanel.add(profileRow);
+        pathPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+
+// SQM data path row
+        JPanel dataRow = new JPanel(new BorderLayout(5, 5));
+        dataRow.add(new JLabel("SQM Data Path:"), BorderLayout.WEST);
+        dataRow.add(dataPathField, BorderLayout.CENTER);
+        JButton browseDataBtn = new JButton("Browse");
+        browseDataBtn.addActionListener(e -> {
+            assert dataDir != null;
+            choosePath(dataPathField, dataDir.toString());
+        });
+        dataRow.add(browseDataBtn, BorderLayout.EAST);
+        pathPanel.add(dataRow);
+        pathPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+// Save button for paths
+        JButton savePathsBtn = new JButton("Save Paths");
+        savePathsBtn.addActionListener(e -> savePathsToConfig());
+        pathPanel.add(savePathsBtn);
+
+        add(pathPanel, BorderLayout.SOUTH);
+
 
         // Split pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
@@ -145,13 +197,16 @@ public class SettingsTab extends JPanel {
                 util.append("[Error] Profile already exists.");
                 return;
             }
+            String newAddress = JOptionPane.showInputDialog(this, "Enter RPi Address:");
             try (FileWriter writer = new FileWriter(newProfileFile)) {
                 Properties props = new Properties();
-                props.setProperty("rpi_name", "");
-                props.setProperty("rpi_addr", "");
+                props.setProperty("rpi_name", newProfileName);
+                props.setProperty("rpi_addr", newAddress);
                 props.store(writer, null);
                 profileListModel.addElement(newProfileName);
                 profileList.setSelectedValue(newProfileName, true);
+                rpiNameField.setText(newProfileName);
+                rpiAddrField.setText(newAddress);
                 util.append("[Settings] New profile added: " + newProfileName);
                 BuildGUI.refreshProfileList();
 
@@ -198,4 +253,54 @@ public class SettingsTab extends JPanel {
             }
         }
     }
+
+    private void choosePath(JTextField targetField, String currentPath) {
+        JFileChooser chooser = new JFileChooser(currentPath);
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setDialogTitle("Select Directory");
+        int result = chooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedDir = chooser.getSelectedFile();
+            targetField.setText(selectedDir.getAbsolutePath());
+        }
+    }
+
+    private void savePathsToConfig() {
+        String profilePath = profilePathField.getText().trim();
+        String dataPath = dataPathField.getText().trim();
+
+        if (profilePath.isEmpty() || dataPath.isEmpty()) {
+            util.append("[Error] Both paths must be set before saving.");
+            return;
+        }
+
+        Path configPath = Paths.get(System.getProperty("user.home"), "profiles", "host_config.properties");
+        Properties props = new Properties();
+
+        try {
+            // Load existing config if it exists
+            if (Files.exists(configPath)) {
+                try (FileReader reader = new FileReader(configPath.toFile())) {
+                    props.load(reader);
+                }
+            }
+
+            // Update values
+            props.setProperty("profile_save_path", profilePath);
+            props.setProperty("sqm_data_path", dataPath);
+
+            // Save updated config
+            try (FileWriter writer = new FileWriter(configPath.toFile())) {
+                props.store(writer, "Updated by SettingsTab");
+            }
+
+            util.append("[Settings] Updated host_config.properties with new paths.");
+            util.showToast(this, "Paths saved successfully.", "success", 2000);
+
+        } catch (IOException ex) {
+            util.append("[Error] Failed to update host_config.properties: " + ex.getMessage());
+            util.showToast(this, "Error saving paths.", "error", 2000);
+        }
+    }
+
 }

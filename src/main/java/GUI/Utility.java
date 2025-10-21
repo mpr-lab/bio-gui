@@ -432,4 +432,12 @@ public class Utility {
         return "unknown";
     }
 
+    static class RPiProfile {
+        JTextField nameField, addrField;
+        RPiProfile(JTextField name, JTextField addr) {
+            this.nameField = name;
+            this.addrField = addr;
+        }
+    }
+
 }
