@@ -358,3 +358,5 @@ This project uses maven as a project/build manager.
 //        return panel;
 //    }
 ```
+
+https://stackoverflow.com/questions/2420742/make-a-jlabel-wrap-its-text-by-setting-a-max-width
