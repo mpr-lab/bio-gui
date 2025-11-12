@@ -1,3 +1,7 @@
+"""
+Runs on host computer, sends a command and gets responses.
+"""
+
 import platform
 import subprocess
 import sys
@@ -15,12 +19,15 @@ for root, dirs, files, in os.walk(current_dir):
 import ui_commands_ssh
 import configs_ssh
 
-# Load from config
+# Wifi/Ethernet connection info
 rpi_addr = configs_ssh.rpi_addr
 rpi_name = configs_ssh.rpi_name
+
+# data storage and repositoru directories
 host_data_path = configs_ssh.host_data_path
 rpi_data_path = configs_ssh.rpi_data_path
 rpi_repo = configs_ssh.rpi_repo
+
 has_radio = configs_ssh.has_radio
 
 IS_WINDOWS = platform.system() == "Windows"
@@ -40,12 +47,14 @@ def send_to_rpi(m: str) -> str:
         tail_cmd = "'tail -n 1 /var/tmp/ssh_debug/rpi_out.txt'"
 
     read_cmd = f"ssh {rpi_name}@{rpi_addr} {tail_cmd}"
+    output = subprocess.check_output(read_cmd, shell=True).decode()
 
-    try:
-        output = subprocess.check_output(read_cmd, shell=True).decode()
-    except subprocess.CalledProcessError as e:
-        output = f"Error: {e}"
-    return output.strip()
+    # try:
+    #     output = subprocess.check_output(read_cmd, shell=True).decode()
+    # except subprocess.CalledProcessError as e:
+    #     output = f"Error: {e}"
+    # return output.strip()
+    return output
 
 
 
@@ -61,11 +70,12 @@ def user_input(data: str) -> None:
         _rsync()
     elif data == "help":
         help_msg = (
-            "Commands:\n"
-            "  ui   – open device UI\n"
-            "  rsync|sync – copy data from sensor\n"
-            "  help – this text\n"
-            "  reload-config – reloads the configs_ssh module\n"
+                "Commands:\n"
+                "  ui   : user interface to generate commands\n"
+                "  rsync | sync : copy data from sensor\n"
+                "  help : print this help menu\n"
+                "  reload-config : reloads the configs_ssh module\n"
+                "  exit | quit | q : stop program\n"
         )
         print(help_msg)
     elif data == "reload-config":
@@ -118,10 +128,11 @@ def _ui_loop() -> None:
         elif s == "help":
             help_msg = (
                 "Commands:\n"
-                "  ui   – open device UI\n"
-                "  rsync|sync – copy data from sensor\n"
-                "  help – this text\n"
-                "  reload-config – reloads the configs_ssh module\n"
+                "  ui   : user interface to generate commands\n"
+                "  rsync | sync : copy data from sensor\n"
+                "  help : print this help menu\n"
+                "  reload-config : reloads the configs_ssh module\n"
+                "  exit | quit | q : stop program\n"
             )
             print(help_msg)
         elif s == "reload-config":
@@ -155,20 +166,27 @@ def _ui_loop() -> None:
 
 
 def _rsync() -> None:
-    # Prefer rsync, fallback to scp if on Windows
+    """
+    Runs rsync command. Sends an rsync trigger in case radio is used
+    Prefer rsync, fallback to scp if on Windows
+    """
     if IS_WINDOWS:
         print("Using SCP instead of rsync on Windows...")
         s = f"scp -r {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
     else:
         s = f"rsync -avz -e ssh {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
-
-    subprocess.run(s, shell=True)
+    
+    os.system(s)
+    # subprocess.run(s, shell=True)
 
     if has_radio:
         send_to_rpi("rsync")
 
 
 def main() -> None:
+    """
+    Starts server and listens for incoming communications
+    """
     _ui_loop()
 
 
