@@ -152,6 +152,10 @@
 
     <dependencies>
         <!-- Add your project dependencies here -->
-
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.6.2</version>
+        </dependency>
     </dependencies>
 </project>

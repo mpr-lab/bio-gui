@@ -1,5 +1,7 @@
 package GUI;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -13,7 +15,7 @@ public class BuildGUI extends JFrame {
     private static JComboBox<String> profileDropdown = new JComboBox<>();
     private final JButton confirmProfileButton = new JButton("Confirm");
 
-    private static boolean setup = false;
+//    private static boolean setup = false;
 
 
 //    private static Path PROFILE_DIR = util.getProfileSaveDirFromConfig();
@@ -132,18 +134,23 @@ public class BuildGUI extends JFrame {
 
     public static void main(String[] args) throws UnsupportedLookAndFeelException {
         try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            // If Nimbus is not available, you can set the GUI to another L&F.
-            // For example, the default cross-platform Metal L&F.
-            UIManager.setLookAndFeel(new MetalLookAndFeel());
-
-        }
+            UIManager.setLookAndFeel( new FlatLightLaf() );
+        } catch( Exception ex ) {
+            System.err.println( "Failed to initialize LaF" );
+        }        UIManager.setLookAndFeel(new MetalLookAndFeel());
+//        try {
+//            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (Exception e) {
+//            // If Nimbus is not available, you can set the GUI to another L&F.
+//            // For example, the default cross-platform Metal L&F.
+//            UIManager.setLookAndFeel(new MetalLookAndFeel());
+//
+//        }
         Path setupDir = Paths.get("host_config.properties");
         if (Files.notExists(setupDir)) {
             SwingUtilities.invokeLater(SetupWizard::new);
